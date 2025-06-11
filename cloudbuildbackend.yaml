@@ -1,5 +1,5 @@
 substitutions:
-  _ENV:gs://d01_7/.env
+  _ENV: gs://d01_7/.env
 steps:
   - name: "gcr.io/cloud-builders/gsutil"
     args: ["cp", "${_ENV}", ".env"]
