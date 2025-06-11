@@ -38,7 +38,7 @@ export const createBarang = async (req, res) => {
     await barang.create({
       Nama,
       harga,
-      Img: file.filename, // hanya simpan nama file, bukan path penuh
+      Img: file ? file.filename : null, // hanya simpan nama file, bukan path penuh
       Deskripsi,
       Kategori,
     });
