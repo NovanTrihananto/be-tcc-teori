@@ -33,8 +33,20 @@ export const createBarang = async (req, res) => {
   try {
     const { Nama, harga, Deskripsi, Kategori } = req.body;
 
+    // Validasi wajib ada
+    if (!Nama || !harga || !Kategori) {
+      return res.status(400).json({ message: "Nama, harga, dan kategori wajib diisi" });
+    }
+
+    // Validasi harga harus angka
+    const hargaInt = parseInt(harga);
+    if (isNaN(hargaInt)) {
+      return res.status(400).json({ message: "Harga harus berupa angka" });
+    }
+
     let imageUrl = null;
 
+    // Upload gambar jika ada
     if (req.file) {
       const fileName = `${Date.now()}-${req.file.originalname}`;
       const blob = bucket.file(fileName);
@@ -55,14 +67,19 @@ export const createBarang = async (req, res) => {
       imageUrl = format(`${process.env.GCS_PUBLIC_URL}/${bucket.name}/${fileName}`);
     }
 
-    // Validasi wajib ada
-    if (!Nama || !harga || !Kategori) {
-      return res.status(400).json({ message: "Nama, harga, dan kategori wajib diisi" });
-    }
+    // Log data yang akan dikirim
+    console.log("📦 Data akan disimpan:", {
+      Nama,
+      harga: hargaInt,
+      Img: imageUrl,
+      Deskripsi,
+      Kategori,
+    });
 
+    // Simpan ke database
     const newBarang = await barang.create({
       Nama,
-      harga: parseInt(harga),
+      harga: hargaInt,
       Img: imageUrl,
       Deskripsi,
       Kategori,
@@ -73,10 +90,18 @@ export const createBarang = async (req, res) => {
       barang: newBarang,
     });
   } catch (err) {
-    console.error("Create Barang Error:", err);
+    console.error("❌ Gagal create barang:", err);
+
+    if (err.errors) {
+      err.errors.forEach(e =>
+        console.error(`Field error: ${e.path} - ${e.message}`)
+      );
+    }
+
     res.status(500).json({
       message: "Gagal menambahkan barang",
       error: err.message,
+      detail: err.errors || null,
     });
   }
 };
