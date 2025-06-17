@@ -55,7 +55,7 @@ export const createBarang = async (req, res) => {
     // Buat file jadi public
     await blob.makePublic();
 
-    const imageUrl = format(`https://storage.googleapis.com/${bucket.name}/${fileName}`);
+    const imageUrl = format(`https://storage.googleapis.com/${d01_7}`);
 
     await barang.create({
       Nama,
