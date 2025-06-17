@@ -4,7 +4,7 @@ import { format } from "util";
 
 // Inisialisasi Storage
 const storage = new Storage();
-const bucket = storage.bucket(process.env.d01_7); 
+const bucket = storage.bucket(process.env.GCS_BUCKET_NAME);
 // GET all barang
 export const getBarang = async (req, res) => {
   try {
@@ -55,7 +55,7 @@ export const createBarang = async (req, res) => {
     // Buat file jadi public
     await blob.makePublic();
 
-    const imageUrl = format(`https://storage.googleapis.com/${d01_7}`);
+    const imageUrl = format(`${process.env.GCS_PUBLIC_URL}/${bucket.name}/${fileName}`);
 
     await barang.create({
       Nama,
