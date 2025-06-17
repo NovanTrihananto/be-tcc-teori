@@ -1,5 +1,5 @@
 import express from "express";
-import upload from "../middleware/upload.js";
+import multer from "multer";
 import {
   getBarang,
   getBarangById,
@@ -8,11 +8,14 @@ import {
   deleteBarang,
 } from "../controllers/Barangcontroller.js";
 
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
 const router = express.Router();
 
 router.get("/barang", getBarang);
 router.get("/barang/:id", getBarangById);
-router.post("/barang", createBarang);
+router.post("/barang", upload.single("Img"), createBarang);
 router.put("/barang/:id", updateBarang);
 router.delete("/barang/:id", deleteBarang);
 
