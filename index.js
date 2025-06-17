@@ -15,7 +15,7 @@ app.set("view engine", "ejs");
 // Middleware
 app.use(cors({
   credentials: true,
-  origin: '"http://localhost:3000"'  // ganti jika frontend beda origin
+  origin: "http://localhost:3000"  // ganti jika frontend beda origin
 }));
 app.use(express.json());
 
