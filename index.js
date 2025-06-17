@@ -15,17 +15,9 @@ app.set("view engine", "ejs");
 // Middleware
 app.use(cors({
   credentials: true,
-  origin: "http://localhost:3000"
+  origin: "http://localhost:3000"  // ganti jika frontend beda origin
 }));
-
-// 💡 Tambahkan ini
-app.options("*", cors({
-  credentials: true,
-  origin: "http://localhost:3000"
-}));
-
 app.use(express.json());
-
 
 // Routes
 app.get("/", (req, res) => res.render("index"));
@@ -46,5 +38,5 @@ db.sync()
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(🚀 Server running on port ${PORT});
 });
