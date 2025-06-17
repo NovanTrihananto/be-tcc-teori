@@ -7,8 +7,8 @@ export const getNota = async (req, res) => {
   try {
     const dataNota = await Nota.findAll({
       include: [
-        { model: barang, attributes: ['Nama', 'harga'] },
-        { model: User, attributes: ['name', 'email'] }, // opsional
+        { model: barang, as : "barang", attributes: ['Nama', 'harga'] },
+        { model: User, as : "User", attributes: ['name', 'email'] }, // opsional
       ],
     });
     res.status(200).json(dataNota);
