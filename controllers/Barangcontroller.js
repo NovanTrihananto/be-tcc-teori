@@ -30,40 +30,54 @@ export const getBarangById = async (req, res) => {
 
 // CREATE barang
 export const createBarang = async (req, res) => {
-  const { Nama, harga, Deskripsi, Kategori } = req.body;
-  const file = req.file;
-
-  if (!file) return res.status(400).json({ message: "Gambar tidak ditemukan" });
-
   try {
-    const fileName = `${Date.now()}-${file.originalname}`;
-    const blob = bucket.file(fileName);
-    const blobStream = blob.createWriteStream({
-      resumable: false,
-      contentType: file.mimetype,
-    });
+    const { Nama, harga, Deskripsi, Kategori } = req.body;
 
-    await new Promise((resolve, reject) => {
-      blobStream.on("error", (err) => {
-        console.error("Upload Error:", err.message);
-        reject(new Error("Gagal upload file ke GCS"));
+    let imageUrl = null;
+
+    if (req.file) {
+      const fileName = `${Date.now()}-${req.file.originalname}`;
+      const blob = bucket.file(fileName);
+      const blobStream = blob.createWriteStream({
+        resumable: false,
+        contentType: req.file.mimetype,
       });
-      blobStream.on("finish", resolve);
-      blobStream.end(file.buffer);
-    });
-    const imageUrl = format(`${process.env.GCS_PUBLIC_URL}/${bucket.name}/${fileName}`);
 
-    await barang.create({
+      await new Promise((resolve, reject) => {
+        blobStream.on("error", (err) => {
+          console.error("Upload Error:", err.message);
+          reject(new Error("Gagal upload file ke GCS"));
+        });
+        blobStream.on("finish", resolve);
+        blobStream.end(req.file.buffer);
+      });
+
+      imageUrl = format(`${process.env.GCS_PUBLIC_URL}/${bucket.name}/${fileName}`);
+    }
+
+    // Validasi wajib ada
+    if (!Nama || !harga || !Kategori) {
+      return res.status(400).json({ message: "Nama, harga, dan kategori wajib diisi" });
+    }
+
+    const newBarang = await barang.create({
       Nama,
-      harga,
+      harga: parseInt(harga),
       Img: imageUrl,
       Deskripsi,
       Kategori,
     });
 
-    res.status(201).json({ message: "Barang berhasil ditambahkan" });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(201).json({
+      message: "Barang berhasil ditambahkan",
+      barang: newBarang,
+    });
+  } catch (err) {
+    console.error("Create Barang Error:", err);
+    res.status(500).json({
+      message: "Gagal menambahkan barang",
+      error: err.message,
+    });
   }
 };
 
