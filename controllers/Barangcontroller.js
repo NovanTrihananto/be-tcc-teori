@@ -51,10 +51,6 @@ export const createBarang = async (req, res) => {
       blobStream.on("finish", resolve);
       blobStream.end(file.buffer);
     });
-
-    // Buat file jadi public
-    await blob.makePublic();
-
     const imageUrl = format(`${process.env.GCS_PUBLIC_URL}/${bucket.name}/${fileName}`);
 
     await barang.create({
